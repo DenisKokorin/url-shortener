@@ -16,6 +16,7 @@ import (
 	"url-shortener/pkg/utils"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 func main() {
@@ -41,6 +42,9 @@ func main() {
 	)
 
 	router := chi.NewRouter()
+
+	router.Use(middleware.Logger)
+	router.Use(middleware.Recoverer)
 
 	router.Post("/", savehandler.NewSaveHandler(log, service))
 	router.Get("/{alias}", gethandler.NewGetHandler(log, service))

@@ -19,21 +19,21 @@ func NewSaveHandler(log *slog.Logger, service api.Service) http.HandlerFunc {
 		err := render.DecodeJSON(r.Body, &req)
 		if errors.Is(err, io.EOF) {
 
-			log.Error("request body is empty")
+			//log.Error("request body is empty")
 
 			render.JSON(w, r, api.ErrorReponse(http.StatusBadRequest, "empty request"))
 
 			return
 		}
 		if err != nil {
-			log.Error("failed to decode request body", logger.ErrorLog(err))
+			//log.Error("failed to decode request body", logger.ErrorLog(err))
 
 			render.JSON(w, r, api.ErrorReponse(http.StatusBadRequest, "failed to decode request"))
 
 			return
 		}
 
-		log.Info("request body decoded", slog.Any("request", req))
+		//log.Info("request body decoded", slog.Any("request", req))
 
 		if err := validator.New().Struct(req); err != nil {
 			validateErr := err.(validator.ValidationErrors)
@@ -47,14 +47,14 @@ func NewSaveHandler(log *slog.Logger, service api.Service) http.HandlerFunc {
 
 		alias, err := service.GetShortURL(r.Context(), req.URL)
 		if err != nil {
-			log.Error("failed to get short url", logger.ErrorLog(err))
+			//log.Error("failed to get short url", logger.ErrorLog(err))
 
 			render.JSON(w, r, api.ErrorReponse(http.StatusInternalServerError, "internal error"))
 
 			return
 		}
 
-		log.Info("url added", slog.String("alias", alias))
+		//log.Info("url added", slog.String("alias", alias))
 
 		render.JSON(w, r, api.ResponseOK(alias))
 	}
