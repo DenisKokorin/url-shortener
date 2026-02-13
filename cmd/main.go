@@ -9,7 +9,11 @@ import (
 	"url-shortener/internal/config"
 	gethandler "url-shortener/internal/handlers/get"
 	savehandler "url-shortener/internal/handlers/save"
+	urlshortenerservice "url-shortener/internal/service"
+	"url-shortener/internal/storage/postgres"
+	"url-shortener/pkg/generator"
 	"url-shortener/pkg/logger"
+	"url-shortener/pkg/utils"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -17,7 +21,18 @@ import (
 func main() {
 	cfg := config.MustLoad()
 
+	postgresPath := utils.MustGetPostgresPath()
+
 	log := logger.SetupLogger(cfg.Env)
+
+	storage, err := postgres.New(postgresPath)
+	if err != nil {
+		panic("failed to init storage")
+	}
+
+	generator := generator.NewAliasGenerator(cfg.AliasLength)
+
+	service := urlshortenerservice.NewURLShortenerService(log, storage, generator)
 
 	log.Info(
 		"starting app",
