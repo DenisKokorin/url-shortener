@@ -27,7 +27,8 @@ func main() {
 
 	storage, err := postgres.New(postgresPath)
 	if err != nil {
-		panic("failed to init storage")
+		log.Error("failed to init storage", logger.ErrorLog(err))
+		os.Exit(1)
 	}
 
 	generator := generator.NewAliasGenerator(cfg.AliasLength)

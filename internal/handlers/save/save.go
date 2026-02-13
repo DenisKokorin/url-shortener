@@ -45,11 +45,13 @@ func NewSaveHandler(log *slog.Logger, service api.Service) http.HandlerFunc {
 			return
 		}
 
-		alias, err := service.GetShortURL(req.URL)
+		alias, err := service.GetShortURL(r.Context(), req.URL)
 		if err != nil {
 			log.Error("failed to get short url", logger.ErrorLog(err))
 
 			render.JSON(w, r, api.ErrorReponse(http.StatusInternalServerError, "internal error"))
+
+			return
 		}
 
 		log.Info("url added", slog.String("alias", alias))

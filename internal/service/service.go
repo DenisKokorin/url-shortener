@@ -1,6 +1,7 @@
 package urlshortenerservice
 
 import (
+	"context"
 	"errors"
 	"log/slog"
 	"url-shortener/internal/storage"
@@ -20,8 +21,8 @@ type AliasGenerator interface {
 }
 
 type Storage interface {
-	SaveURL(url string, alias string) error
-	GetLongURL(alias string) (string, error)
+	SaveURL(ctx context.Context, url string, alias string) error
+	GetLongURL(ctx context.Context, alias string) (string, error)
 }
 
 type URLShortenerService struct {
@@ -38,12 +39,12 @@ func NewURLShortenerService(log *slog.Logger, storage Storage, generator AliasGe
 	}
 }
 
-func (s *URLShortenerService) GetShortURL(url string) (string, error) {
+func (s *URLShortenerService) GetShortURL(ctx context.Context, url string) (string, error) {
 	var alias string
 
 	for range retryCount {
 		alias = s.generator.Generate(url)
-		err := s.storage.SaveURL(url, alias)
+		err := s.storage.SaveURL(ctx, url, alias)
 		if errors.Is(err, storage.ErrURLAlreadyExists) {
 			continue
 		}
@@ -56,8 +57,8 @@ func (s *URLShortenerService) GetShortURL(url string) (string, error) {
 	return alias, nil
 }
 
-func (s *URLShortenerService) GetLongURL(alias string) (string, error) {
-	url, err := s.storage.GetLongURL(alias)
+func (s *URLShortenerService) GetLongURL(ctx context.Context, alias string) (string, error) {
+	url, err := s.storage.GetLongURL(ctx, alias)
 	if errors.Is(err, storage.ErrURLNotFound) {
 		return "", err
 	}

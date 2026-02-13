@@ -1,10 +1,14 @@
 package postgres
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
 	"url-shortener/internal/storage"
+	"url-shortener/pkg/utils"
+
+	_ "github.com/lib/pq"
 
 	"github.com/jackc/pgx/v5/pgconn"
 )
@@ -23,10 +27,15 @@ func New(path string) (*Storage, error) {
 		return nil, fmt.Errorf("failed to connect to DB: %w", err)
 	}
 
+	err = utils.ApplyMigration(path)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Storage{db: db}, nil
 }
 
-func (s *Storage) SaveURL(url string, alias string) error {
+func (s *Storage) SaveURL(_ context.Context, url string, alias string) error {
 	stmt, err := s.db.Prepare("INSERT INTO url(alias, url) VALUES($1, $2)")
 	if err != nil {
 		return fmt.Errorf("failed to prepare sql statement: %w", err)
@@ -47,7 +56,7 @@ func (s *Storage) SaveURL(url string, alias string) error {
 	return nil
 }
 
-func (s *Storage) GetLongURL(alias string) (string, error) {
+func (s *Storage) GetLongURL(_ context.Context, alias string) (string, error) {
 	stmt, err := s.db.Prepare("SELECT url FROM url WHERE alias = $1")
 	if err != nil {
 		return "", fmt.Errorf("failed to prepare sql statement: %w", err)

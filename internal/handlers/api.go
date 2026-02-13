@@ -1,6 +1,9 @@
 package api
 
-import "net/http"
+import (
+	"context"
+	"net/http"
+)
 
 type Request struct {
 	URL string `json:"url" validate:"required,url"`
@@ -39,6 +42,6 @@ func URLResponse(url string) LongURLReponse {
 }
 
 type Service interface {
-	GetShortURL(url string) (string, error)
-	GetLongURL(alias string) (string, error)
+	GetShortURL(ctx context.Context, url string) (string, error)
+	GetLongURL(ctx context.Context, alias string) (string, error)
 }

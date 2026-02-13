@@ -23,7 +23,7 @@ func NewGetHandler(log *slog.Logger, service api.Service) http.HandlerFunc {
 			return
 		}
 
-		resURL, err := service.GetLongURL(alias)
+		resURL, err := service.GetLongURL(r.Context(), alias)
 		if errors.Is(err, urlshortenerservice.ErrURLNotFound) {
 			log.Info("url not found", "alias", alias)
 
