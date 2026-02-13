@@ -3,6 +3,7 @@ package urlshortenerservice
 import (
 	"errors"
 	"log/slog"
+	"url-shortener/internal/storage"
 	"url-shortener/pkg/logger"
 )
 
@@ -43,7 +44,7 @@ func (s *URLShortenerService) GetShortURL(url string) (string, error) {
 	for range retryCount {
 		alias = s.generator.Generate(url)
 		err := s.storage.SaveURL(url, alias)
-		if errors.Is(err, storage.ErrURLExists) {
+		if errors.Is(err, storage.ErrURLAlreadyExists) {
 			continue
 		}
 
