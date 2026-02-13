@@ -12,7 +12,7 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-func New(log *slog.Logger, service api.Service) http.HandlerFunc {
+func NewSaveHandler(log *slog.Logger, service api.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req api.Request
 

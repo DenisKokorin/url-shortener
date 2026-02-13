@@ -12,6 +12,11 @@ type Response struct {
 	Alias  string `json:"alias,omitempty"`
 }
 
+type LongURLReponse struct {
+	Status int    `json:"status"`
+	URL    string `json:"url"`
+}
+
 func ErrorReponse(status int, msg string) Response {
 	return Response{
 		Status: status,
@@ -23,6 +28,13 @@ func ResponseOK(alias string) Response {
 	return Response{
 		Status: http.StatusCreated,
 		Alias:  alias,
+	}
+}
+
+func URLResponse(url string) LongURLReponse {
+	return LongURLReponse{
+		Status: http.StatusOK,
+		URL:    url,
 	}
 }
 
