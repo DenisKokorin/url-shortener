@@ -8,10 +8,15 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
+const (
+	CONFIG_PATH = "./config/config.yaml"
+)
+
 type Config struct {
-	Env        string `yaml:"env" env-default:"local"`
-	Storage    string `yaml:"storage" env-default:"memory"`
-	HTTPServer `yaml:"http_server"`
+	Env         string `yaml:"env" env-default:"local"`
+	Storage     string `yaml:"storage" env-default:"memory"`
+	AliasLength int    `yaml:"alias_length" env-default:"10"`
+	HTTPServer  `yaml:"http_server"`
 }
 
 type HTTPServer struct {
@@ -21,7 +26,7 @@ type HTTPServer struct {
 }
 
 func MustLoad() *Config {
-	configPath := os.Getenv("CONFIG_PATH")
+	configPath := CONFIG_PATH
 	if configPath == "" {
 		panic("CONFIG_PATH is not set")
 	}

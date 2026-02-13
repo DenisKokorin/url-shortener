@@ -1,5 +1,6 @@
 env: "local"
 storage: "postgres" # postgres | memory
+alias_length: 10
 http_server:
   address: "0.0.0.0:8080"
   timeout: 4s
