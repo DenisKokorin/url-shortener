@@ -35,13 +35,13 @@ func New(path string) (*Storage, error) {
 	return &Storage{db: db}, nil
 }
 
-func (s *Storage) SaveURL(_ context.Context, url string, alias string) error {
-	stmt, err := s.db.Prepare("INSERT INTO url(alias, url) VALUES($1, $2)")
+func (s *Storage) SaveURL(ctx context.Context, url string, alias string) error {
+	stmt, err := s.db.PrepareContext(ctx, "INSERT INTO url(alias, url) VALUES($1, $2)")
 	if err != nil {
 		return fmt.Errorf("failed to prepare sql statement: %w", err)
 	}
 
-	_, err = stmt.Exec(alias, url)
+	_, err = stmt.ExecContext(ctx, alias, url)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
@@ -56,15 +56,15 @@ func (s *Storage) SaveURL(_ context.Context, url string, alias string) error {
 	return nil
 }
 
-func (s *Storage) GetLongURL(_ context.Context, alias string) (string, error) {
-	stmt, err := s.db.Prepare("SELECT url FROM url WHERE alias = $1")
+func (s *Storage) GetLongURL(ctx context.Context, alias string) (string, error) {
+	stmt, err := s.db.PrepareContext(ctx, "SELECT url FROM url WHERE alias = $1")
 	if err != nil {
 		return "", fmt.Errorf("failed to prepare sql statement: %w", err)
 	}
 
 	var resURL string
 
-	err = stmt.QueryRow(alias).Scan(&resURL)
+	err = stmt.QueryRowContext(ctx, alias).Scan(&resURL)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return "", storage.ErrURLNotFound

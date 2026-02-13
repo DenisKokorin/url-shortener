@@ -2,66 +2,35 @@ package memory
 
 import (
 	"context"
-	"sync"
+	"errors"
 	"url-shortener/internal/storage"
+	shardedmap "url-shortener/pkg/map"
 )
 
-const (
-	shardsNumber = 10
-)
-
-type Storage struct {
-	shards []*Shard
+type MemoryStorage struct {
+	storage *shardedmap.ShardedMap
 }
 
-type Shard struct {
-	sync.RWMutex
-	items map[string]string
-}
-
-func NewMemoryStorage() *Storage {
-	s := &Storage{
-		shards: make([]*Shard, shardsNumber),
+func NewMemoryStorage() *MemoryStorage {
+	return &MemoryStorage{
+		storage: shardedmap.NewShardedMap(),
 	}
-
-	for i := 0; i < shardsNumber; i++ {
-		s.shards[i] = &Shard{
-			items: make(map[string]string),
-		}
-	}
-
-	return s
 }
 
-func (s *Storage) getShard(key string) *Shard {
-	return nil
-}
-
-func (s *Storage) SaveURL(_ context.Context, url string, alias string) error {
-	shard := s.getShard(alias)
-
-	shard.Lock()
-	defer shard.Unlock()
-
-	if _, ok := shard.items[alias]; !ok {
+func (ms *MemoryStorage) SaveURL(ctx context.Context, url string, alias string) error {
+	err := ms.storage.Save(ctx, url, alias)
+	if errors.Is(err, shardedmap.ErrAlreadyExists) {
 		return storage.ErrURLAlreadyExists
 	}
 
-	shard.items[alias] = url
-
 	return nil
 }
 
-func (s *Storage) GetLongURL(_ context.Context, alias string) (string, error) {
-	shard := s.getShard(alias)
-
-	shard.RLock()
-	defer shard.RUnlock()
-
-	url, ok := shard.items[alias]
-	if !ok {
+func (ms *MemoryStorage) GetLongURL(ctx context.Context, alias string) (string, error) {
+	url, err := ms.storage.Get(ctx, alias)
+	if errors.Is(err, shardedmap.ErrNotFound) {
 		return "", storage.ErrURLNotFound
 	}
 
-	return url, nil
+	return url.(string), nil
 }
