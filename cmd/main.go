@@ -7,6 +7,8 @@ import (
 	"os/signal"
 	"syscall"
 	"url-shortener/internal/config"
+	gethandler "url-shortener/internal/handlers/get"
+	savehandler "url-shortener/internal/handlers/save"
 	"url-shortener/pkg/logger"
 
 	"github.com/go-chi/chi/v5"
@@ -24,8 +26,8 @@ func main() {
 
 	router := chi.NewRouter()
 
-	router.Post("/", func(w http.ResponseWriter, r *http.Request) { w.Write([]byte("created")) })
-	router.Get("/{alias}", func(w http.ResponseWriter, r *http.Request) { w.Write([]byte("OK")) })
+	router.Post("/", savehandler.NewSaveHandler(log, service))
+	router.Get("/{alias}", gethandler.NewGetHandler(log, service))
 
 	log.Info("starting server", slog.String("address", cfg.Address))
 
