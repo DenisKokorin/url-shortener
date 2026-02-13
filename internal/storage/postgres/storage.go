@@ -41,7 +41,7 @@ func (s *Storage) SaveURL(_ context.Context, url string, alias string) error {
 		return fmt.Errorf("failed to prepare sql statement: %w", err)
 	}
 
-	_, err = stmt.Exec(stmt, alias, url)
+	_, err = stmt.Exec(alias, url)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {

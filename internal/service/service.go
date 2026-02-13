@@ -45,13 +45,15 @@ func (s *URLShortenerService) GetShortURL(ctx context.Context, url string) (stri
 	for range retryCount {
 		alias = s.generator.Generate(url)
 		err := s.storage.SaveURL(ctx, url, alias)
-		if errors.Is(err, storage.ErrURLAlreadyExists) {
-			continue
+		if err != nil {
+			if errors.Is(err, storage.ErrURLAlreadyExists) {
+				continue
+			}
+
+			s.log.Error("failed to save url", logger.ErrorLog(err))
 		}
 
-		s.log.Error("failed to save url", logger.ErrorLog(err))
-
-		return "", err
+		return alias, err
 	}
 
 	return alias, nil
