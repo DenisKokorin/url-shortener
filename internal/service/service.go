@@ -17,7 +17,7 @@ var (
 )
 
 type AliasGenerator interface {
-	Generate() string
+	Generate() (string, error)
 }
 
 type Storage interface {
@@ -45,14 +45,21 @@ func (s *URLShortenerService) GetShortURL(ctx context.Context, url string) (stri
 	s.log.Info("saving url", slog.String("url", url))
 
 	for range retryCount {
+		var err error
 
 		s.log.Info("generating alias")
 
-		alias = s.generator.Generate()
+		alias, err = s.generator.Generate()
+		if err != nil {
+
+			s.log.Error("failed to generate alias", logger.ErrorLog(err))
+
+			return "", err
+		}
 
 		s.log.Info("got alias", slog.String("alias", alias))
 
-		err := s.storage.SaveURL(ctx, url, alias)
+		err = s.storage.SaveURL(ctx, url, alias)
 		if err != nil {
 			if errors.Is(err, storage.ErrURLAlreadyExists) {
 
