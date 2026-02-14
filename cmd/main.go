@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log/slog"
 	"net/http"
 	"os"
@@ -75,4 +76,16 @@ func main() {
 
 	<-done
 	log.Info("stopping server")
+
+	ctx, cancel := context.WithTimeout(context.Background(), cfg.HTTPServer.IdleTimeout)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+
+		log.Error("failed to stop server", logger.ErrorLog(err))
+
+		return
+	}
+
+	log.Info("server stopped")
 }
