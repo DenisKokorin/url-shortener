@@ -3,6 +3,7 @@ package memory
 import (
 	"context"
 	"errors"
+	"fmt"
 	"url-shortener/internal/storage"
 	shardedmap "url-shortener/pkg/map"
 )
@@ -32,5 +33,10 @@ func (ms *MemoryStorage) GetLongURL(ctx context.Context, alias string) (string, 
 		return "", storage.ErrURLNotFound
 	}
 
-	return url.(string), nil
+	urlString, ok := url.(string)
+	if !ok {
+		return "", fmt.Errorf("unexpected type")
+	}
+
+	return urlString, nil
 }

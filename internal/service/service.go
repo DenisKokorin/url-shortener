@@ -42,11 +42,22 @@ func NewURLShortenerService(log *slog.Logger, storage Storage, generator AliasGe
 func (s *URLShortenerService) GetShortURL(ctx context.Context, url string) (string, error) {
 	var alias string
 
+	s.log.Info("saving url", slog.String("url", url))
+
 	for range retryCount {
+
+		s.log.Info("generating alias")
+
 		alias = s.generator.Generate(url)
+
+		s.log.Info("got alias", slog.String("alias", alias))
+
 		err := s.storage.SaveURL(ctx, url, alias)
 		if err != nil {
 			if errors.Is(err, storage.ErrURLAlreadyExists) {
+
+				s.log.Warn("alias already exists, trying get new")
+
 				continue
 			}
 
@@ -56,12 +67,20 @@ func (s *URLShortenerService) GetShortURL(ctx context.Context, url string) (stri
 		return alias, err
 	}
 
+	s.log.Info("url added", slog.String("url", url), slog.String("alias", alias))
+
 	return alias, nil
 }
 
 func (s *URLShortenerService) GetLongURL(ctx context.Context, alias string) (string, error) {
+
+	s.log.Info("trying get url from storage")
+
 	url, err := s.storage.GetLongURL(ctx, alias)
 	if errors.Is(err, storage.ErrURLNotFound) {
+
+		s.log.Warn("url not found", slog.String("alias", alias))
+
 		return "", err
 	}
 
@@ -71,6 +90,8 @@ func (s *URLShortenerService) GetLongURL(ctx context.Context, alias string) (str
 
 		return "", nil
 	}
+
+	s.log.Info("got url from storage", slog.String("url", url), slog.String("alias", alias))
 
 	return url, nil
 }
