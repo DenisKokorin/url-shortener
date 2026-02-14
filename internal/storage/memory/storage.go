@@ -19,7 +19,7 @@ func NewMemoryStorage() *MemoryStorage {
 }
 
 func (ms *MemoryStorage) SaveURL(ctx context.Context, url string, alias string) error {
-	err := ms.storage.Save(ctx, url, alias)
+	err := ms.storage.Save(ctx, alias, url)
 	if errors.Is(err, shardedmap.ErrAlreadyExists) {
 		return storage.ErrURLAlreadyExists
 	}
@@ -35,7 +35,7 @@ func (ms *MemoryStorage) GetLongURL(ctx context.Context, alias string) (string, 
 
 	urlString, ok := url.(string)
 	if !ok {
-		return "", fmt.Errorf("unexpected type")
+		return "", fmt.Errorf("unexpected type, res: %s", url)
 	}
 
 	return urlString, nil

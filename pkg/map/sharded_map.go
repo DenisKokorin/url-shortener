@@ -3,6 +3,8 @@ package shardedmap
 import (
 	"context"
 	"errors"
+	"fmt"
+	"hash/fnv"
 	"sync"
 	"url-shortener/internal/storage"
 )
@@ -40,7 +42,10 @@ func NewShardedMap() *ShardedMap {
 }
 
 func (s *ShardedMap) getShard(key any) *Shard {
-	return nil
+	hasher := fnv.New32a()
+	hasher.Write([]byte(fmt.Sprint(key)))
+	idx := int(hasher.Sum32()) % shardsNumber
+	return s.shards[idx]
 }
 
 func (s *ShardedMap) Save(_ context.Context, key any, value any) error {
@@ -49,7 +54,7 @@ func (s *ShardedMap) Save(_ context.Context, key any, value any) error {
 	shard.Lock()
 	defer shard.Unlock()
 
-	if _, ok := shard.items[key]; !ok {
+	if _, ok := shard.items[key]; ok {
 		return ErrAlreadyExists
 	}
 
@@ -64,10 +69,10 @@ func (s *ShardedMap) Get(_ context.Context, key any) (any, error) {
 	shard.RLock()
 	defer shard.RUnlock()
 
-	url, ok := shard.items[key]
+	res, ok := shard.items[key]
 	if !ok {
 		return "", storage.ErrURLNotFound
 	}
 
-	return url, nil
+	return res, nil
 }

@@ -1,4 +1,4 @@
-package middleware
+package logmiddleware
 
 import (
 	"log/slog"
@@ -25,7 +25,6 @@ func NewLogMiddleware(log *slog.Logger) func(next http.Handler) http.Handler {
 			defer func() {
 				l.Info("request completed",
 					slog.Int("status", ww.Status()),
-					slog.Int("bytes", ww.BytesWritten()),
 					slog.String("duration", time.Since(t).String()),
 				)
 			}()

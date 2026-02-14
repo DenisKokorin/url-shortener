@@ -17,7 +17,7 @@ var (
 )
 
 type AliasGenerator interface {
-	Generate(s string) string
+	Generate() string
 }
 
 type Storage interface {
@@ -48,7 +48,7 @@ func (s *URLShortenerService) GetShortURL(ctx context.Context, url string) (stri
 
 		s.log.Info("generating alias")
 
-		alias = s.generator.Generate(url)
+		alias = s.generator.Generate()
 
 		s.log.Info("got alias", slog.String("alias", alias))
 

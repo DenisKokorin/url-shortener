@@ -9,11 +9,11 @@ import (
 	"url-shortener/internal/config"
 	gethandler "url-shortener/internal/handlers/get"
 	savehandler "url-shortener/internal/handlers/save"
+	logmiddleware "url-shortener/internal/middleware"
 	urlshortenerservice "url-shortener/internal/service"
-	"url-shortener/internal/storage/postgres"
+	"url-shortener/internal/storage/memory"
 	"url-shortener/pkg/generator"
 	"url-shortener/pkg/logger"
-	"url-shortener/pkg/utils"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -22,15 +22,17 @@ import (
 func main() {
 	cfg := config.MustLoad()
 
-	postgresPath := utils.MustGetPostgresPath()
+	//postgresPath := utils.MustGetPostgresPath()
 
 	log := logger.SetupLogger(cfg.Env)
 
-	storage, err := postgres.New(postgresPath)
-	if err != nil {
-		log.Error("failed to init storage", logger.ErrorLog(err))
-		os.Exit(1)
-	}
+	storage := memory.NewMemoryStorage()
+
+	// storage, err := postgres.New(postgresPath)
+	// if err != nil {
+	// 	log.Error("failed to init storage", logger.ErrorLog(err))
+	// 	os.Exit(1)
+	// }
 
 	generator := generator.NewAliasGenerator(cfg.AliasLength)
 
@@ -44,6 +46,7 @@ func main() {
 	router := chi.NewRouter()
 
 	router.Use(middleware.Logger)
+	router.Use(logmiddleware.NewLogMiddleware(log))
 	router.Use(middleware.Recoverer)
 
 	router.Post("/", savehandler.NewSaveHandler(log, service))
