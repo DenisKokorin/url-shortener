@@ -1,4 +1,4 @@
-env: "local"
+env: "local" # local | dev | prod
 storage: "postgres" # postgres | memory
 alias_length: 10
 http_server:
