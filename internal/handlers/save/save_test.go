@@ -18,39 +18,34 @@ import (
 
 func TestSaveHandler(t *testing.T) {
 	tests := []struct {
-		name       string
-		alias      string
-		url        string
-		httpStatus int
-		respError  string
-		mockError  error
+		name      string
+		alias     string
+		url       string
+		respError string
+		mockError error
 	}{
 		{
-			name:       "Success",
-			alias:      "test_alias",
-			url:        "http://www.google.com/",
-			httpStatus: 200,
+			name:  "Success",
+			alias: "test_alias",
+			url:   "http://www.google.com/",
 		},
 		{
-			name:       "Empty URL",
-			url:        "",
-			alias:      "",
-			httpStatus: 400,
-			respError:  "url is empty",
+			name:      "Empty URL",
+			url:       "",
+			alias:     "",
+			respError: "url is empty",
 		},
 		{
-			name:       "Invalid URL",
-			url:        "invalid URL",
-			alias:      "",
-			httpStatus: 400,
-			respError:  "invalid request",
+			name:      "Invalid URL",
+			url:       "invalid URL",
+			alias:     "",
+			respError: "invalid request",
 		},
 		{
-			name:       "SaveURL Error",
-			alias:      "",
-			url:        "https://google.com",
-			httpStatus: 500,
-			respError:  "internal error",
+			name:      "SaveURL Error",
+			alias:     "",
+			url:       "https://google.com",
+			respError: "internal error",
 		},
 	}
 
@@ -63,7 +58,7 @@ func TestSaveHandler(t *testing.T) {
 
 			mockService := mock_api.NewMockService(ctrl)
 
-			if tt.httpStatus != 400 {
+			if tt.respError == "" || tt.respError == "internal error" {
 				mockService.EXPECT().GetShortURL(gomock.Any(), tt.url).Return(tt.alias, tt.mockError)
 			}
 

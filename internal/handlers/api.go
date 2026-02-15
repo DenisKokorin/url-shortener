@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"net/http"
 )
 
 type Request struct {
@@ -10,34 +9,29 @@ type Request struct {
 }
 
 type Response struct {
-	Status int    `json:"status"`
-	Error  string `json:"error,omitempty"`
-	Alias  string `json:"alias,omitempty"`
+	Error string `json:"error,omitempty"`
+	Alias string `json:"alias,omitempty"`
 }
 
 type LongURLReponse struct {
-	Status int    `json:"status"`
-	URL    string `json:"url"`
+	URL string `json:"url"`
 }
 
-func ErrorReponse(status int, msg string) Response {
+func ErrorReponse(msg string) Response {
 	return Response{
-		Status: status,
-		Error:  msg,
+		Error: msg,
 	}
 }
 
 func ResponseOK(alias string) Response {
 	return Response{
-		Status: http.StatusCreated,
-		Alias:  alias,
+		Alias: alias,
 	}
 }
 
 func URLResponse(url string) LongURLReponse {
 	return LongURLReponse{
-		Status: http.StatusOK,
-		URL:    url,
+		URL: url,
 	}
 }
 

@@ -18,12 +18,12 @@ func NewSaveHandler(log *slog.Logger, service api.Service) http.HandlerFunc {
 		err := render.DecodeJSON(r.Body, &req)
 		if errors.Is(err, io.EOF) {
 			render.Status(r, http.StatusBadRequest)
-			render.JSON(w, r, api.ErrorReponse(http.StatusBadRequest, "empty request"))
+			render.JSON(w, r, api.ErrorReponse("empty request"))
 			return
 		}
 		if err != nil {
 			render.Status(r, http.StatusBadRequest)
-			render.JSON(w, r, api.ErrorReponse(http.StatusBadRequest, "failed to decode request"))
+			render.JSON(w, r, api.ErrorReponse("failed to decode request"))
 			return
 		}
 
@@ -32,14 +32,14 @@ func NewSaveHandler(log *slog.Logger, service api.Service) http.HandlerFunc {
 		if err := validator.New().Struct(req); err != nil {
 			validateErr := err.(validator.ValidationErrors)
 			render.Status(r, http.StatusBadRequest)
-			render.JSON(w, r, api.ErrorReponse(http.StatusBadRequest, validateErr.Error()))
+			render.JSON(w, r, api.ErrorReponse(validateErr.Error()))
 			return
 		}
 
 		alias, err := service.GetShortURL(r.Context(), req.URL)
 		if err != nil {
 			render.Status(r, http.StatusInternalServerError)
-			render.JSON(w, r, api.ErrorReponse(http.StatusInternalServerError, "internal error"))
+			render.JSON(w, r, api.ErrorReponse("internal error"))
 			return
 		}
 

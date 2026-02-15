@@ -17,12 +17,11 @@ import (
 
 func TestGetHandler(t *testing.T) {
 	tests := []struct {
-		name       string
-		alias      string
-		url        string
-		httpStatus int
-		respError  string
-		mockError  error
+		name      string
+		alias     string
+		url       string
+		respError string
+		mockError error
 	}{
 		{
 			name:  "Success",
