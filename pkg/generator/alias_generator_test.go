@@ -4,7 +4,6 @@ import (
 	"testing"
 	"url-shortener/pkg/generator"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -42,7 +41,7 @@ func TestAliasGenerator(t *testing.T) {
 
 			require.NoError(t, err)
 
-			assert.Len(t, s, tt.aliasLength)
+			require.Len(t, s, tt.aliasLength)
 		})
 	}
 }

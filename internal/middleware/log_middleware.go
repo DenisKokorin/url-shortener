@@ -19,17 +19,17 @@ func NewLogMiddleware(log *slog.Logger) func(next http.Handler) http.Handler {
 				slog.String("method", r.Method),
 				slog.String("path", r.URL.Path),
 			)
-			ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
+			rw := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
 
 			t := time.Now()
 			defer func() {
 				l.Info("request completed",
-					slog.Int("status", ww.Status()),
+					slog.Int("status", rw.Status()),
 					slog.String("duration", time.Since(t).String()),
 				)
 			}()
 
-			next.ServeHTTP(ww, r)
+			next.ServeHTTP(rw, r)
 		}
 
 		return http.HandlerFunc(fn)

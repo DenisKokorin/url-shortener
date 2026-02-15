@@ -21,12 +21,23 @@ func TestGetHandler(t *testing.T) {
 		alias     string
 		url       string
 		respError string
-		mockError error
 	}{
 		{
 			name:  "Success",
 			alias: "test_alias",
 			url:   "https://www.google.com/",
+		},
+		{
+			name:      "Url not found",
+			alias:     "test_alias",
+			url:       "",
+			respError: "url not found",
+		},
+		{
+			name:      "Internal error",
+			alias:     "test_alias",
+			url:       "",
+			respError: "internal error",
 		},
 	}
 
@@ -39,9 +50,7 @@ func TestGetHandler(t *testing.T) {
 
 			mockService := mock_api.NewMockService(ctrl)
 
-			if tt.respError == "" {
-				mockService.EXPECT().GetLongURL(gomock.Any(), tt.alias).Return(tt.url, tt.mockError)
-			}
+			mockService.EXPECT().GetLongURL(gomock.Any(), tt.alias).Return(tt.url, nil)
 
 			handler := gethandler.NewGetHandler(slog.Default(), mockService)
 

@@ -43,7 +43,13 @@ func NewSaveHandler(log *slog.Logger, service api.Service) http.HandlerFunc {
 			return
 		}
 
+		res := getResponseUrl(r.Host, alias)
+
 		render.Status(r, http.StatusOK)
-		render.JSON(w, r, api.ResponseOK(alias))
+		render.JSON(w, r, api.ResponseOK(res))
 	}
+}
+
+func getResponseUrl(host, alias string) string {
+	return "http://" + host + "/" + alias
 }

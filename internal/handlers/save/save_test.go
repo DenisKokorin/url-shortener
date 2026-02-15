@@ -22,7 +22,6 @@ func TestSaveHandler(t *testing.T) {
 		alias     string
 		url       string
 		respError string
-		mockError error
 	}{
 		{
 			name:  "Success",
@@ -59,7 +58,7 @@ func TestSaveHandler(t *testing.T) {
 			mockService := mock_api.NewMockService(ctrl)
 
 			if tt.respError == "" || tt.respError == "internal error" {
-				mockService.EXPECT().GetShortURL(gomock.Any(), tt.url).Return(tt.alias, tt.mockError)
+				mockService.EXPECT().GetShortURL(gomock.Any(), tt.url).Return(tt.alias, nil)
 			}
 
 			handler := savehandler.NewSaveHandler(slog.Default(), mockService)
