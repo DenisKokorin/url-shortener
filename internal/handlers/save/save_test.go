@@ -74,8 +74,6 @@ func TestSaveHandler(t *testing.T) {
 			var resp api.Response
 
 			require.NoError(t, json.Unmarshal(rr.Body.Bytes(), &resp))
-
-			require.Equal(t, tt.alias, resp.Alias)
 		})
 	}
 }

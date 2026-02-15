@@ -70,7 +70,7 @@ func (s *ShardedMap) Get(_ context.Context, key any) (any, error) {
 
 	res, ok := shard.items[key]
 	if !ok {
-		return "", ErrAlreadyExists
+		return "", ErrNotFound
 	}
 
 	return res, nil

@@ -14,7 +14,8 @@ const (
 )
 
 var (
-	ErrURLNotFound = errors.New("url not found")
+	ErrURLNotFound      = errors.New("url not found")
+	ErrURLAlreadyExists = errors.New("url already exists")
 )
 
 type AliasGenerator interface {
@@ -84,7 +85,7 @@ func (s *URLShortenerService) GetLongURL(ctx context.Context, alias string) (str
 
 		s.log.Warn("url not found", slog.String("alias", alias))
 
-		return "", err
+		return "", ErrURLNotFound
 	}
 
 	if err != nil {
