@@ -19,11 +19,11 @@ http_server:
 Создайте файл `.env` в папке env проекта:
 
 ```env
-DB_USER=DB_USER
-DB_PASSWORD=DB_PASSWORD
-DB_HOST=DB_HOST
-DB_PORT=DB_PORT
-DB_NAME=DB_NAME
+DB_USER=user
+DB_PASSWORD=password
+DB_HOST=postgres
+DB_PORT=5432
+DB_NAME=db
 ```
 
 ### 3. Запустите сервер
