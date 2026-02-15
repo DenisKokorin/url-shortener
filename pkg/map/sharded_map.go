@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"hash/fnv"
 	"sync"
-	"url-shortener/internal/storage"
 )
 
 const (
@@ -71,7 +70,7 @@ func (s *ShardedMap) Get(_ context.Context, key any) (any, error) {
 
 	res, ok := shard.items[key]
 	if !ok {
-		return "", storage.ErrURLNotFound
+		return "", ErrAlreadyExists
 	}
 
 	return res, nil

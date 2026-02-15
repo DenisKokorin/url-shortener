@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"url-shortener/internal/storage"
+	er "url-shortener/pkg/errors"
 	"url-shortener/pkg/utils"
 
 	_ "github.com/lib/pq"
@@ -21,7 +21,7 @@ type Storage struct {
 	db *pgx.Conn
 }
 
-func New(path string) (*Storage, error) {
+func NewPostgresStorage(path string) (*Storage, error) {
 	db, err := pgx.Connect(context.Background(), path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to DB: %w", err)
@@ -43,7 +43,7 @@ func (s *Storage) SaveURL(ctx context.Context, url string, alias string) error {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
 			if pgErr.Code == CodeUniqueViolation {
-				return storage.ErrURLAlreadyExists
+				return er.ErrURLAlreadyExists
 			}
 		}
 
@@ -61,7 +61,7 @@ func (s *Storage) GetLongURL(ctx context.Context, alias string) (string, error) 
 	err := s.db.QueryRow(ctx, stmt, alias).Scan(&resURL)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return "", storage.ErrURLNotFound
+			return "", er.ErrURLNotFound
 		}
 
 		return "", fmt.Errorf("failed to get url from DB: %w", err)

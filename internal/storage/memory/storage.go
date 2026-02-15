@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"url-shortener/internal/storage"
+	er "url-shortener/pkg/errors"
 	shardedmap "url-shortener/pkg/map"
 )
 
@@ -21,7 +21,7 @@ func NewMemoryStorage() *MemoryStorage {
 func (ms *MemoryStorage) SaveURL(ctx context.Context, url string, alias string) error {
 	err := ms.storage.Save(ctx, alias, url)
 	if errors.Is(err, shardedmap.ErrAlreadyExists) {
-		return storage.ErrURLAlreadyExists
+		return er.ErrURLAlreadyExists
 	}
 
 	return nil
@@ -30,7 +30,7 @@ func (ms *MemoryStorage) SaveURL(ctx context.Context, url string, alias string) 
 func (ms *MemoryStorage) GetLongURL(ctx context.Context, alias string) (string, error) {
 	url, err := ms.storage.Get(ctx, alias)
 	if errors.Is(err, shardedmap.ErrNotFound) {
-		return "", storage.ErrURLNotFound
+		return "", er.ErrURLNotFound
 	}
 
 	urlString, ok := url.(string)

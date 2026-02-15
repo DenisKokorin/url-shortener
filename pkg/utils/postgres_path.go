@@ -7,8 +7,12 @@ import (
 	"github.com/joho/godotenv"
 )
 
+const (
+	envPath = "./env/.env"
+)
+
 func MustGetPostgresPath() string {
-	err := godotenv.Load()
+	err := godotenv.Load(envPath)
 	if err != nil {
 		panic(err)
 	}

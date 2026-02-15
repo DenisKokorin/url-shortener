@@ -12,7 +12,7 @@ import (
 	savehandler "url-shortener/internal/handlers/save"
 	logmiddleware "url-shortener/internal/middleware"
 	urlshortenerservice "url-shortener/internal/service"
-	"url-shortener/internal/storage/memory"
+	"url-shortener/internal/storage"
 	"url-shortener/pkg/generator"
 	"url-shortener/pkg/logger"
 
@@ -23,17 +23,13 @@ import (
 func main() {
 	cfg := config.MustLoad()
 
-	//postgresPath := utils.MustGetPostgresPath()
-
 	log := logger.SetupLogger(cfg.Env)
 
-	storage := memory.NewMemoryStorage()
-
-	// storage, err := postgres.New(postgresPath)
-	// if err != nil {
-	// 	log.Error("failed to init storage", logger.ErrorLog(err))
-	// 	os.Exit(1)
-	// }
+	storage, err := storage.GetStorageFromConfig(cfg)
+	if err != nil {
+		log.Error("failed to init storage", logger.ErrorLog(err))
+		os.Exit(1)
+	}
 
 	generator := generator.NewAliasGenerator(cfg.AliasLength)
 
