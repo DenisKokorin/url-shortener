@@ -40,15 +40,21 @@ func NewShardedMap() *ShardedMap {
 	return s
 }
 
-func (s *ShardedMap) getShard(key any) *Shard {
+func (s *ShardedMap) getShard(key any) (*Shard, error) {
 	hasher := fnv.New32a()
-	fmt.Fprint(hasher, key)
+	_, err := fmt.Fprint(hasher, key)
+	if err != nil {
+		return nil, fmt.Errorf("failed to hash key: %w", err)
+	}
 	idx := int(hasher.Sum32()) % shardsNumber
-	return s.shards[idx]
+	return s.shards[idx], nil
 }
 
 func (s *ShardedMap) Save(_ context.Context, key any, value any) error {
-	shard := s.getShard(key)
+	shard, err := s.getShard(key)
+	if err != nil {
+		return fmt.Errorf("failed to get shard: %w", err)
+	}
 
 	shard.Lock()
 	defer shard.Unlock()
@@ -63,7 +69,10 @@ func (s *ShardedMap) Save(_ context.Context, key any, value any) error {
 }
 
 func (s *ShardedMap) Get(_ context.Context, key any) (any, error) {
-	shard := s.getShard(key)
+	shard, err := s.getShard(key)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get shard: %w", err)
+	}
 
 	shard.RLock()
 	defer shard.RUnlock()

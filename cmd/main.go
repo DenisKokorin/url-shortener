@@ -76,7 +76,7 @@ func main() {
 	<-done
 	log.Info("stopping server")
 
-	ctx, cancel := context.WithTimeout(context.Background(), cfg.HTTPServer.IdleTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), cfg.IdleTimeout)
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
