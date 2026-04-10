@@ -18,6 +18,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
@@ -27,7 +28,7 @@ func main() {
 
 	storage, err := storage.GetStorageFromConfig(cfg)
 	if err != nil {
-		log.Error("failed to init storage", logger.ErrorLog(err))
+		log.Error("failed t	o init storage", logger.ErrorLog(err))
 		os.Exit(1)
 	}
 
@@ -48,6 +49,8 @@ func main() {
 
 	router.Post("/", savehandler.NewSaveHandler(log, service))
 	router.Get("/{alias}", gethandler.NewGetHandler(log, service))
+
+	router.Get("/metrics", promhttp.Handler().ServeHTTP)
 
 	log.Info("starting server", slog.String("address", cfg.Address))
 
