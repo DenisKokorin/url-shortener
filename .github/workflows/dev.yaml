@@ -44,4 +44,5 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: user/repo-name:test-build
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
