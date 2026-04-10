@@ -42,7 +42,7 @@ func NewShardedMap() *ShardedMap {
 
 func (s *ShardedMap) getShard(key any) *Shard {
 	hasher := fnv.New32a()
-	hasher.Write([]byte(fmt.Sprint(key)))
+	fmt.Fprint(hasher, key)
 	idx := int(hasher.Sum32()) % shardsNumber
 	return s.shards[idx]
 }
